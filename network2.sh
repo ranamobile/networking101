@@ -7,9 +7,8 @@ source functions.sh
 
 case $1 in
   start)
-    clonevm client1
-    clonevm router1
-    clonevm client2
+    # Clone nodes from Debian image
+    clonevms client1 router1 client2
 
     # Connect both nodes to the first host-only interface and start the VMs
     startvm client1 vboxnet0
@@ -19,12 +18,15 @@ case $1 in
 
   stop)
     # Poweroff the running nodes
-    stopvm client1
-    stopvm router1
-    stopvm client2
+    stopvms client1 router1 client2
+    ;;
+
+  destroy)
+    # Destroy all nodes
+    destroyvms client1 router1 client2
     ;;
 
   *)
-    echo "usage: $0 [start|stop]"
+    echo "usage: $0 (start|stop|destroy)"
     ;;
 esac

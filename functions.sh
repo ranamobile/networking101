@@ -3,28 +3,54 @@
 # Basic VirtualBox functions.
 
 clonevm() {
-  NODE_NAME=$1
-  echo "Cloning ${NODE_NAME}..."
-  if [ ! "$(vboxmanage list vms | grep -i ${NODE_NAME})" ]; then
-    vboxmanage clonevm "Debian-7.8-amd64-minimal" --name "${NODE_NAME}" --register
+  NODENAME=$1
+  echo "Cloning ${NODENAME}..."
+  if [ ! "$(vboxmanage list vms | grep -i ${NODENAME})" ]; then
+    vboxmanage clonevm "Debian-7.8-amd64-minimal" --name "${NODENAME}" --register
   fi
 }
 
+clonevms() {
+  for nodename in "$@"; do
+    clonevm ${nodename}
+  done
+}
+
 startvm() {
-  NODE_NAME=$1
+  NODENAME=$1
   NIC1=${2:-vboxnet0}
   NIC2=${3:-none}
-  echo "Starting ${NODE_NAME} with nic1 ${NIC1} and nic2 ${NIC2}..."
-  if [ ! "$(vboxmanage list runningvms | grep -i ${NODE_NAME})" ]; then
-    vboxmanage modifyvm ${NODE_NAME} --nic1 hostonly --hostonlyadapter1 ${NIC1} --nic2 ${NIC2} --nic3 none --nic4 none    
-    vboxmanage startvm ${NODE_NAME}
+  echo "Starting ${NODENAME} with nic1 ${NIC1} and nic2 ${NIC2}..."
+  if [ ! "$(vboxmanage list runningvms | grep -i ${NODENAME})" ]; then
+    vboxmanage modifyvm ${NODENAME} --nic1 hostonly --hostonlyadapter1 ${NIC1} --nic2 ${NIC2} --nic3 none --nic4 none    
+    vboxmanage startvm ${NODENAME}
   fi
 }
 
 stopvm() {
-  NODE_NAME=$1
-  echo "Stopping ${NODE_NAME}..."
-  if [ "$(vboxmanage list runningvms | grep -i ${NODE_NAME})" ]; then
-    vboxmanage controlvm ${NODE_NAME} poweroff
+  NODENAME=$1
+  echo "Stopping ${NODENAME}..."
+  if [ "$(vboxmanage list runningvms | grep -i ${NODENAME})" ]; then
+    vboxmanage controlvm ${NODENAME} poweroff
   fi
+}
+
+stopvms() {
+  for nodename in "$@"; do
+    stopvm ${nodename}
+  done
+}
+
+destroyvm() {
+  NODENAME=$1
+  stopvm ${NODENAME}
+  if [ "$(vboxmanage list vms | grep -i ${NODENAME})" ]; then
+    vboxmanage unregistervm ${NODENAME} --delete
+  fi
+}
+
+destroyvms() {
+  for nodename in "$@"; do
+    destroyvm ${nodename}
+  done
 }
