@@ -44,6 +44,7 @@ stopvms() {
 destroyvm() {
   NODENAME=$1
   stopvm ${NODENAME}
+  sleep 0.5  # Give VM time to update VirtualBox status
   if [ "$(vboxmanage list vms | grep -i ${NODENAME})" ]; then
     vboxmanage unregistervm ${NODENAME} --delete
   fi

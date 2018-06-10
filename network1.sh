@@ -2,7 +2,7 @@
 #
 # Configure Network 1 for the training.
 #
-# node1 ---------- node2
+# node1 ---net0--- node2
 source functions.sh
 
 case $1 in
