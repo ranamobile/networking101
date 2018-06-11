@@ -3,6 +3,7 @@
 # Configure Network 4 for the training.
 #
 # client1 ---net0--- router1 ---net1--- router2 ---net2--- router3 ---net3--- client2
+cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd
 source functions.sh
 
 case $1 in

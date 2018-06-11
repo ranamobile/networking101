@@ -3,6 +3,7 @@
 # Configure Network 1 for the training.
 #
 # node1 ---net0--- node2
+cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd
 source functions.sh
 
 case $1 in
