@@ -18,11 +18,14 @@ clonevms() {
 
 startvm() {
   NODENAME=$1
-  NIC1=${2:-vboxnet0}
-  NIC2=${3:-none}
-  echo "Starting ${NODENAME} with nic1 ${NIC1} and nic2 ${NIC2}..."
+  NIC1=$([ "$2" ] && echo "--nic1 hostonly --hostonlyadapter1 $2" || echo "--nic1 none")
+  NIC2=$([ "$3" ] && echo "--nic2 hostonly --hostonlyadapter2 $3" || echo "--nic2 none")
+  NIC3=$([ "$4" ] && echo "--nic3 hostonly --hostonlyadapter3 $4" || echo "--nic3 none")
+  NIC4=$([ "$5" ] && echo "--nic4 hostonly --hostonlyadapter4 $5" || echo "--nic4 none")
+
+  echo "Starting ${NODENAME} with ${NIC1} ${NIC2} ${NIC3} ${NIC4}..."
   if [ ! "$(vboxmanage list runningvms | grep -i ${NODENAME})" ]; then
-    vboxmanage modifyvm ${NODENAME} --nic1 hostonly --hostonlyadapter1 ${NIC1} --nic2 ${NIC2} --nic3 none --nic4 none    
+    vboxmanage modifyvm ${NODENAME} ${NIC1} ${NIC2} ${NIC3} ${NIC4}
     vboxmanage startvm ${NODENAME}
   fi
 }
@@ -54,4 +57,19 @@ destroyvms() {
   for nodename in "$@"; do
     destroyvm ${nodename}
   done
+}
+
+waitforvm() {
+  NODENAME=$1
+  echo "Waiting for ${NODENAME} to boot..."
+  while ! sendcmd ${NODENAME} /bin/ls >/dev/null 2>/dev/null; do
+    sleep 1
+  done
+}
+
+sendcmd() {
+  NODENAME=$1
+  COMMAND=${@:2}
+  vboxmanage guestcontrol ${NODENAME} --username root --password toor run -- ${COMMAND}
+  return $?
 }
